@@ -842,7 +842,7 @@ export function SynapseViz() {
           {/* ═══════════════════════════════════════════════════
               SYNAPTIC CLEFT
           ═══════════════════════════════════════════════════ */}
-          <rect x="70" y="355" width="340" height="90" fill="rgba(4,28,50,0.55)"/>
+          <rect x="108" y="355" width="264" height="92" fill="rgba(4,28,50,0.55)"/>
           <text x={CX} y="385" textAnchor="middle" fontSize="7"
             fill="rgba(148,163,184,0.3)" fontFamily="Inter">Synaptic Cleft (~20 nm)</text>
 
@@ -884,9 +884,9 @@ export function SynapseViz() {
           {/* ═══════════════════════════════════════════════════
               POST-SYNAPTIC MEMBRANE — bilayer (outer + inner leaflet)
           ═══════════════════════════════════════════════════ */}
-          {/* Outer leaflet */}
+          {/* Outer leaflet — matches pre-synaptic active zone width (120→360) */}
           <path
-            d="M 63,447 C 66,447 68,446 70,445 Q 240,430 410,445 C 412,446 414,447 417,447"
+            d="M 108,447 C 111,447 114,446 118,445 Q 240,430 362,445 C 366,446 369,447 372,447"
             fill="none"
             stroke={stageNum === 5 ? `rgba(244,114,182,${0.38 + recBound * 0.48})` : 'rgba(52,211,153,0.42)'}
             strokeWidth="3.5"
@@ -895,7 +895,7 @@ export function SynapseViz() {
           />
           {/* Inner leaflet */}
           <path
-            d="M 71,454 C 74,453 76,452 78,452 Q 240,438 402,452 C 404,452 406,453 409,454"
+            d="M 116,455 C 119,454 122,453 126,453 Q 240,439 354,453 C 358,453 361,454 364,455"
             fill="none"
             stroke={stageNum === 5 ? `rgba(244,114,182,${0.18 + recBound * 0.28})` : 'rgba(52,211,153,0.22)'}
             strokeWidth="2"
@@ -993,17 +993,18 @@ export function SynapseViz() {
           })}
 
           {/* POST-SYNAPTIC DENDRITE BODY — rounded arch cross-section of a cylindrical dendrite.
-              Top edge matches inner leaflet exactly (no gap → no ghost line).
+              Top edge aligns with inner leaflet (116→364) — no gap, no ghost line.
+              Width matches pre-synaptic terminal (~108→372) for visual consistency.
               Bottom is a pronounced arch that exits the viewport naturally. */}
           {stageNum === 5 && recBound > 0.1 && (
             <path
-              d="M 63,452 Q 240,437 417,452 C 435,510 432,595 399,634 Q 240,654 81,634 C 48,595 45,510 63,452 Z"
+              d="M 108,453 Q 240,438 372,453 C 388,508 385,592 360,630 Q 240,650 120,630 C 95,592 92,508 108,453 Z"
               fill={`rgba(244,114,182,${recBound * 0.08})`}
               filter="url(#glow-p)"
             />
           )}
           <path
-            d="M 63,452 Q 240,437 417,452 C 435,510 432,595 399,634 Q 240,654 81,634 C 48,595 45,510 63,452 Z"
+            d="M 108,453 Q 240,438 372,453 C 388,508 385,592 360,630 Q 240,650 120,630 C 95,592 92,508 108,453 Z"
             fill="url(#postGrad)"
           />
           <text x={CX} y="520" textAnchor="middle" fontSize="8.5"
