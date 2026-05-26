@@ -195,6 +195,7 @@ export function SynapseViz() {
   const speedRef = useRef(1);
   speedRef.current = speed;
   const [prog, setProg] = useState(0);       // 0-1 within stage
+  const [neuronTip, setNeuronTip] = useState<{ label: string; desc: string } | null>(null);
   const rafRef = useRef<number>(0);
   const lastRef = useRef<number>(0);
   const siRef  = useRef(si);
@@ -470,6 +471,32 @@ export function SynapseViz() {
             strokeWidth="1"
           />
 
+          {/* ── Mitochondria — two organelles in the cytoplasm, one per side ── */}
+          {([
+            { cx: 148, cy: 182 },
+            { cx: 332, cy: 182 },
+          ] as { cx: number; cy: number }[]).map((m, i) => (
+            <g key={`mito-${i}`} opacity={0.78}>
+              {/* Outer membrane */}
+              <ellipse cx={m.cx} cy={m.cy} rx={22} ry={11}
+                fill="rgba(245,158,11,0.09)"
+                stroke="rgba(245,158,11,0.48)" strokeWidth="1.2"/>
+              {/* Inner membrane */}
+              <ellipse cx={m.cx} cy={m.cy} rx={16} ry={6.5}
+                fill="rgba(251,191,36,0.05)"
+                stroke="rgba(251,191,36,0.25)" strokeWidth="0.75"/>
+              {/* Cristae folds — 3 vertical lines */}
+              {[-6, 0, 6].map(ox => (
+                <line key={ox}
+                  x1={m.cx + ox} y1={m.cy - 6} x2={m.cx + ox} y2={m.cy + 6}
+                  stroke="rgba(251,191,36,0.28)" strokeWidth="0.75" strokeLinecap="round"/>
+              ))}
+              {/* Label */}
+              <text x={m.cx} y={m.cy + 20} textAnchor="middle"
+                fontSize="5" fontFamily="Inter" fill="rgba(251,191,36,0.30)">ATP</text>
+            </g>
+          ))}
+
           {/* "Pre-synaptic Terminal" label */}
           <text x={CX} y="200" textAnchor="middle" fontSize="8.5"
             fill="rgba(165,180,252,0.38)" fontFamily="Inter">Pre-synaptic Bouton</text>
@@ -503,6 +530,29 @@ export function SynapseViz() {
           ═══════════════════════════════════════════════════ */}
           {stageNum === 2 && renderAxonWave(axonWave)}
           {stageNum === 2 && renderTerminalWave(termWave, apFront)}
+
+          {/* ── Stage 2: Signal speed indicator (top-right extracellular space) ── */}
+          {stageNum === 2 && apFront > 0.06 && (() => {
+            const fadeIn  = Math.min(1, apFront * 6);
+            const speedMs = Math.round(lerp(12, 120, apFront));
+            return (
+              <g opacity={fadeIn}>
+                <rect x={394} y={10} width={80} height={36} rx={7}
+                  fill="rgba(251,191,36,0.08)"
+                  stroke="rgba(251,191,36,0.38)" strokeWidth="0.85"/>
+                <text x={434} y={25} textAnchor="middle"
+                  fontSize="5.5" fontFamily="Inter" fontWeight="600"
+                  fill="rgba(251,191,36,0.52)" letterSpacing="0.06em">
+                  SIGNAL SPEED
+                </text>
+                <text x={434} y={39} textAnchor="middle"
+                  fontSize="11" fontFamily="Inter" fontWeight="700"
+                  fill="rgba(251,191,36,0.92)" filter="url(#glow-y)">
+                  ~{speedMs} m/s
+                </text>
+              </g>
+            );
+          })()}
 
           {/* ═══════════════════════════════════════════════════
               Ca²⁺ CHANNELS on the SIDES of terminal
@@ -1383,7 +1433,52 @@ export function SynapseViz() {
                     </g>
                   ))}
 
+                  {/* ══ Transparent hover hotspots — tooltip hit regions ══ */}
+                  {([
+                    { x:  0, y:  0, w: 62, h:128, label:'Dendrites',            desc:'Branch-like extensions that receive incoming signals from other neurons' },
+                    { x: 52, y: 36, w: 46, h: 48, label:'Cell Body (Soma)',      desc:'Integrates all incoming signals; contains the nucleus' },
+                    { x: 96, y: 50, w:111, h: 20, label:'Axon & Myelin Sheath',  desc:'Long fiber conducting impulses; white segments (myelin) speed transmission' },
+                    { x:207, y: 26, w: 37, h: 70, label:'Axon Terminals',        desc:'Bulb-shaped endings that release neurotransmitters into the synaptic cleft' },
+                    { x:244, y: 28, w: 22, h: 72, label:'Synaptic Cleft',        desc:'~20 nm gap where neurotransmitters diffuse from one neuron to the next' },
+                    { x:266, y:  0, w: 60, h:128, label:'Dendrites',             desc:'Dendritic spines face the cleft and carry receptors that bind neurotransmitters' },
+                    { x:292, y: 36, w: 48, h: 48, label:'Cell Body (Soma)',      desc:'Sums received signals; fires a new action potential if threshold is reached' },
+                    { x:348, y: 50, w:100, h: 20, label:'Axon & Myelin Sheath',  desc:'Propagates the resulting action potential to the next synapse' },
+                    { x:449, y: 26, w: 38, h: 70, label:'Axon Terminals',        desc:'Pass the signal forward — the start of the next synapse in the chain' },
+                  ] as { x:number; y:number; w:number; h:number; label:string; desc:string }[]).map((hs, i) => (
+                    <rect key={`hs-${i}`} x={hs.x} y={hs.y} width={hs.w} height={hs.h}
+                      fill="transparent" style={{ cursor: 'crosshair' }}
+                      onMouseEnter={() => setNeuronTip({ label: hs.label, desc: hs.desc })}
+                      onMouseLeave={() => setNeuronTip(null)}
+                    />
+                  ))}
                 </svg>
+
+                {/* Tooltip strip — fades in on neuron hover */}
+                <div style={{
+                  minHeight: 34,
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '0 2px',
+                  opacity: neuronTip ? 1 : 0,
+                  transform: neuronTip ? 'translateY(0)' : 'translateY(-3px)',
+                  transition: 'opacity 0.18s ease, transform 0.18s ease',
+                  pointerEvents: 'none',
+                }}>
+                  <div style={{
+                    width: 2.5, alignSelf: 'stretch', borderRadius: 2, flexShrink: 0,
+                    background: `linear-gradient(to bottom, ${stage.color}cc, ${stage.color}44)`,
+                  }}/>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, fontFamily: 'Inter',
+                      color: neuronTip ? stage.color : 'transparent',
+                      transition: 'color 0.18s', letterSpacing: '0.02em' }}>
+                      {neuronTip?.label}
+                    </span>
+                    <span style={{ fontSize: 9, fontFamily: 'Inter', lineHeight: 1.4,
+                      color: 'rgba(255,255,255,0.45)' }}>
+                      {neuronTip?.desc}
+                    </span>
+                  </div>
+                </div>
 
                 {/* Stage progress dots — horizontal row */}
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: 4 }}>
