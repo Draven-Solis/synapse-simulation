@@ -471,59 +471,57 @@ export function SynapseViz() {
             strokeWidth="1"
           />
 
-          {/* ── Mitochondria — two organelles, moved above Ca²⁺ channels ── */}
-          {([
-            { cx: 148, cy: 155 },
-            { cx: 332, cy: 155 },
-          ] as { cx: number; cy: number }[]).map((m, i) => {
+          {/* ── Single centred Mitochondrion — well inside the bouton ── */}
+          {(() => {
+            const MCX = 240, MCY = 162;
             const mitoGlow = stageNum >= 3 ? clamp01(caOpen * 1.6) : 0;
             return (
-              <g key={`mito-${i}`} opacity={0.82}>
-                {/* Stage-3 energy glow halo */}
+              <g opacity={0.84}>
+                {/* Energy glow halo — brightens during Stage 3 */}
                 {mitoGlow > 0.05 && (
-                  <ellipse cx={m.cx} cy={m.cy} rx={28} ry={16}
-                    fill={`rgba(245,158,11,${mitoGlow * 0.18})`}
+                  <ellipse cx={MCX} cy={MCY} rx={34} ry={18}
+                    fill={`rgba(245,158,11,${mitoGlow * 0.16})`}
                     filter="url(#glow-y)"/>
                 )}
                 {/* Outer membrane */}
-                <ellipse cx={m.cx} cy={m.cy} rx={24} ry={12}
+                <ellipse cx={MCX} cy={MCY} rx={26} ry={13}
                   fill="rgba(245,158,11,0.09)"
-                  stroke={mitoGlow > 0.1 ? `rgba(245,158,11,${0.48 + mitoGlow * 0.38})` : 'rgba(245,158,11,0.48)'}
-                  strokeWidth="1.3"
+                  stroke={mitoGlow > 0.1
+                    ? `rgba(245,158,11,${0.52 + mitoGlow * 0.36})`
+                    : 'rgba(245,158,11,0.52)'}
+                  strokeWidth="1.4"
                   filter={mitoGlow > 0.4 ? 'url(#glow-y)' : undefined}/>
-                {/* Matrix — dark interior fill */}
-                <ellipse cx={m.cx} cy={m.cy} rx={18} ry={8}
-                  fill="rgba(12,8,3,0.58)"/>
-                {/* Inner membrane boundary */}
-                <ellipse cx={m.cx} cy={m.cy} rx={18} ry={8}
+                {/* Intermembrane space ring */}
+                <ellipse cx={MCX} cy={MCY} rx={22} ry={10.5}
                   fill="none"
-                  stroke="rgba(251,191,36,0.32)" strokeWidth="0.85"/>
-                {/* Cristae — 4 curved folds, alternating top/bottom */}
-                {/* Fold 1: from top at cx-8 */}
-                <path d={`M ${m.cx-8},${m.cy-7.5} Q ${m.cx-8},${m.cy-2} ${m.cx-5},${m.cy+1}`}
-                  stroke="rgba(251,191,36,0.42)" strokeWidth="0.85" fill="none" strokeLinecap="round"/>
-                {/* Fold 2: from bottom at cx-2 */}
-                <path d={`M ${m.cx-2},${m.cy+7.5} Q ${m.cx-2},${m.cy+2} ${m.cx+1},${m.cy-1}`}
-                  stroke="rgba(251,191,36,0.38)" strokeWidth="0.85" fill="none" strokeLinecap="round"/>
-                {/* Fold 3: from top at cx+4 */}
-                <path d={`M ${m.cx+4},${m.cy-7.5} Q ${m.cx+4},${m.cy-2} ${m.cx+7},${m.cy+1}`}
-                  stroke="rgba(251,191,36,0.42)" strokeWidth="0.85" fill="none" strokeLinecap="round"/>
-                {/* Fold 4: from bottom at cx+10 */}
-                <path d={`M ${m.cx+10},${m.cy+7.5} Q ${m.cx+10},${m.cy+2} ${m.cx+13},${m.cy-1}`}
-                  stroke="rgba(251,191,36,0.38)" strokeWidth="0.85" fill="none" strokeLinecap="round"/>
-                {/* Intermembrane space accent — faint ring between outer and inner */}
-                <ellipse cx={m.cx} cy={m.cy} rx={21} ry={10}
+                  stroke="rgba(251,191,36,0.09)" strokeWidth="3"/>
+                {/* Matrix — dark fill */}
+                <ellipse cx={MCX} cy={MCY} rx={19} ry={8.5}
+                  fill="rgba(12,8,3,0.60)"/>
+                {/* Inner membrane */}
+                <ellipse cx={MCX} cy={MCY} rx={19} ry={8.5}
                   fill="none"
-                  stroke="rgba(251,191,36,0.10)" strokeWidth="2.5"/>
+                  stroke="rgba(251,191,36,0.34)" strokeWidth="0.9"/>
+                {/* Cristae — 4 alternating curved folds (top / bottom) */}
+                <path d={`M ${MCX-9},${MCY-8.3} Q ${MCX-9},${MCY-2} ${MCX-6},${MCY+1}`}
+                  stroke="rgba(251,191,36,0.44)" strokeWidth="0.9" fill="none" strokeLinecap="round"/>
+                <path d={`M ${MCX-2},${MCY+8.3} Q ${MCX-2},${MCY+2} ${MCX+1},${MCY-1}`}
+                  stroke="rgba(251,191,36,0.40)" strokeWidth="0.9" fill="none" strokeLinecap="round"/>
+                <path d={`M ${MCX+5},${MCY-8.3} Q ${MCX+5},${MCY-2} ${MCX+8},${MCY+1}`}
+                  stroke="rgba(251,191,36,0.44)" strokeWidth="0.9" fill="none" strokeLinecap="round"/>
+                <path d={`M ${MCX+12},${MCY+8.3} Q ${MCX+12},${MCY+2} ${MCX+15},${MCY-1}`}
+                  stroke="rgba(251,191,36,0.40)" strokeWidth="0.9" fill="none" strokeLinecap="round"/>
                 {/* Label */}
-                <text x={m.cx} y={m.cy + 21} textAnchor="middle"
-                  fontSize="5" fontFamily="Inter"
-                  fill={mitoGlow > 0.1 ? `rgba(251,191,36,${0.32 + mitoGlow * 0.4})` : 'rgba(251,191,36,0.28)'}>
+                <text x={MCX} y={MCY + 22} textAnchor="middle"
+                  fontSize="5.5" fontFamily="Inter"
+                  fill={mitoGlow > 0.1
+                    ? `rgba(251,191,36,${0.34 + mitoGlow * 0.44})`
+                    : 'rgba(251,191,36,0.30)'}>
                   Mitochondrion
                 </text>
               </g>
             );
-          })}
+          })()}
 
           {/* "Pre-synaptic Terminal" label */}
           <text x={CX} y="200" textAnchor="middle" fontSize="8.5"
@@ -685,20 +683,52 @@ export function SynapseViz() {
             </g>
           )}
 
-          {/* Mitochondria callout — stage 3 (right side, above Ca²⁺ label) */}
+          {/* Mitochondria callout — stage 3, leader from centred mito right edge */}
           {stageNum === 3 && caOpen > 0.25 && (
             <g opacity={clamp01((caOpen - 0.25) * 3.5)}>
-              {/* dashed leader from right mito outer edge to label */}
-              <line x1="357" y1="150" x2="418" y2="136"
+              <line x1="266" y1="157" x2="360" y2="136"
                 stroke="rgba(245,158,11,0.38)" strokeWidth="0.9" strokeDasharray="3 2"/>
-              <text x="420" y="134" textAnchor="start" fontSize="7.5"
-                fill="rgba(245,158,11,0.78)" fontFamily="Inter" fontWeight="600">Mitochondria</text>
-              <text x="420" y="144" textAnchor="start" fontSize="6.5"
-                fill="rgba(245,158,11,0.48)" fontFamily="Inter">supply ATP energy</text>
-              <text x="420" y="153" textAnchor="start" fontSize="6.5"
+              <text x="362" y="132" textAnchor="start" fontSize="7.5"
+                fill="rgba(245,158,11,0.78)" fontFamily="Inter" fontWeight="600">Mitochondrion</text>
+              <text x="362" y="142" textAnchor="start" fontSize="6.5"
+                fill="rgba(245,158,11,0.48)" fontFamily="Inter">supplies ATP energy</text>
+              <text x="362" y="151" textAnchor="start" fontSize="6.5"
                 fill="rgba(245,158,11,0.38)" fontFamily="Inter">for vesicle docking</text>
             </g>
           )}
+
+          {/* ── Stage 3: ATP molecules travelling from mito to vesicle pools ── */}
+          {stageNum === 3 && prog > 0.04 && (() => {
+            const MCX = 240, MCY = 162;
+            // Two targets — left & right reserve-vesicle clusters
+            const streams: { ctrlX: number; ctrlY: number; endX: number; endY: number; phase: number }[] = [
+              { ctrlX: 185, ctrlY: 215, endX: 188, endY: 294, phase: 0      },
+              { ctrlX: 295, ctrlY: 215, endX: 292, endY: 294, phase: 0.33   },
+              { ctrlX: 185, ctrlY: 215, endX: 188, endY: 294, phase: 0.66   },
+              { ctrlX: 295, ctrlY: 215, endX: 292, endY: 294, phase: 0.17   },
+            ];
+            return streams.map((s, i) => {
+              const raw = ((prog * 3.5) + s.phase) % 1;   // 3.5 waves per stage
+              const t   = raw * raw * (3 - 2 * raw);       // smoothstep
+              const fadeOp = Math.sin(raw * Math.PI) * 0.9;
+              if (fadeOp < 0.06) return null;
+              // Quadratic bezier: P = (1-t)²·Start + 2t(1-t)·Ctrl + t²·End
+              const u = 1 - t;
+              const px = u*u*MCX + 2*u*t*s.ctrlX + t*t*s.endX;
+              const py = u*u*MCY + 2*u*t*s.ctrlY + t*t*s.endY;
+              return (
+                <g key={`atp-${i}`} opacity={fadeOp}>
+                  <circle cx={px} cy={py} r={6.5}
+                    fill="rgba(245,158,11,0.18)"
+                    stroke="rgba(245,158,11,0.72)" strokeWidth="1.1"
+                    filter="url(#glow-y)"/>
+                  <text x={px} y={py + 2.2} textAnchor="middle"
+                    fontSize="4.8" fontFamily="Inter" fontWeight="800"
+                    fill="rgba(245,158,11,0.95)">ATP</text>
+                </g>
+              );
+            });
+          })()}
 
           {/* ═══════════════════════════════════════════════════
               EXTRACELLULAR / INTRACELLULAR SPATIAL LABELS
