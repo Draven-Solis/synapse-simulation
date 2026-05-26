@@ -195,7 +195,6 @@ export function SynapseViz() {
   const speedRef = useRef(1);
   speedRef.current = speed;
   const [prog, setProg] = useState(0);       // 0-1 within stage
-  const [neuronTip, setNeuronTip] = useState<{ label: string; desc: string } | null>(null);
   const rafRef = useRef<number>(0);
   const lastRef = useRef<number>(0);
   const siRef  = useRef(si);
@@ -207,7 +206,6 @@ export function SynapseViz() {
   const ep = eio(p);
 
   // Wave particles
-  const apActive   = stageNum === 2 || (stageNum === 2 && ep < 1);
   const postActive = stageNum === 5;
   const axonWave   = useWaveParticles(7, stageNum >= 2 && stageNum <= 2);
   const termWave   = useWaveParticles(5, stageNum === 2 && ep > 0.5);
@@ -913,7 +911,6 @@ export function SynapseViz() {
             const bindT = bound ? clamp01((recBound - ri * 0.14) / 0.55) : 0;
             const my    = rec.memY;
             const cx    = rec.cx;
-            const colS  = bound ? '#f472b6' : 'rgba(52,211,153,0.72)';
             const colF  = bound ? `rgba(244,114,182,${0.35 + bindT * 0.4})` : 'rgba(52,211,153,0.22)';
             const colSt = bound ? `rgba(244,114,182,0.85)` : 'rgba(52,211,153,0.72)';
             return (
@@ -1054,7 +1051,7 @@ export function SynapseViz() {
           {/* ── Mini neuron context map + stage progress ── */}
           {(() => {
             const pulse = 0.6 + 0.4 * Math.sin(animTime / 520);
-            const s2 = stageNum === 2 ? ep * pulse : stageNum > 2 ? 0.38 : stageNum === 1 ? 0.14 : 0;
+            const s2 = stageNum === 2 ? ep * pulse : stageNum > 2 ? 0.38 : 0;
             const s3 = stageNum === 3 ? ep * pulse : stageNum > 3 ? 0.38 : 0;
             const s4 = stageNum === 4 ? ep * pulse : stageNum > 4 ? 0.38 : 0;
             const s5 = stageNum === 5 ? ep * pulse : 0;
@@ -1066,14 +1063,6 @@ export function SynapseViz() {
                   return { id: i, y: lerp(72, 133, t), op: Math.sin(t * Math.PI) * ep };
                 })
               : [];
-            // NT dots drift across cleft
-            const ntDts = stageNum >= 4
-              ? [0,1,2,3].map(i => ({
-                  id: i, cx: 46 + i * 9,
-                  cy: lerp(151, 160, ((animTime / 620 + i * 0.27) % 1)),
-                  op: clamp01(ep * 3) * 0.9,
-                }))
-              : [];
             // Post AP particles travel into post-synaptic cell body
             const poPts = stageNum === 5
               ? [0, 0.38, 0.74].map((off, i) => {
@@ -1083,9 +1072,11 @@ export function SynapseViz() {
               : [];
 
             const preStroke  = s2 > 0.1 ? `rgba(251,191,36,${Math.min(s2,0.95)})` : 'rgba(99,102,241,0.4)';
-            const bouStroke  = s3 > 0.1 ? `rgba(52,211,153,${Math.min(s3,0.95)})` : 'rgba(99,102,241,0.38)';
+            const bouStroke  = s4 > 0.1
+              ? `rgba(96,165,250,${Math.min(s4,0.95)})`
+              : s3 > 0.1 ? `rgba(52,211,153,${Math.min(s3,0.95)})` : 'rgba(99,102,241,0.38)';
             const clfStroke  = s4 > 0.1 ? `rgba(96,165,250,${Math.min(s4,0.95)})` : 'rgba(99,102,241,0.26)';
-            const postStroke = s5 > 0.1 ? `rgba(244,114,182,${Math.min(s5,0.95)})` : 'rgba(52,211,153,0.34)';
+            const postStroke = s5 > 0.1 ? `rgba(244,114,182,${Math.min(s5,0.95)})` : 'rgba(99,102,241,0.28)';
 
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20,
@@ -1093,7 +1084,7 @@ export function SynapseViz() {
                 borderRadius: 12, padding: '10px 12px' }}>
 
                 {/* Pre-synaptic + synapse gap + post-synaptic neuron, landscape, no labels */}
-                <svg viewBox="0 0 530 120" width="100%" height={96} style={{ display: 'block', overflow: 'visible' }}>
+                <svg viewBox="0 0 530 128" width="100%" height={68} style={{ display: 'block', overflow: 'visible' }}>
                   <defs>
                     <filter id="mgy" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                     <filter id="mgg" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
@@ -1392,50 +1383,7 @@ export function SynapseViz() {
                     </g>
                   ))}
 
-                  {/* ══ Transparent hover hotspots (on top, for tooltip detection) ══ */}
-                  {([
-                    { x:  0, y:  0, w: 62, h:120, label:'Dendrites',           desc:'Branch-like extensions that receive incoming signals from other neurons' },
-                    { x: 52, y: 38, w: 44, h: 44, label:'Cell Body (Soma)',     desc:'Integrates all incoming signals and contains the nucleus' },
-                    { x: 96, y: 50, w:111, h: 20, label:'Axon & Myelin Sheath', desc:'Long fiber conducting impulses; white segments (myelin) speed transmission via saltatory conduction' },
-                    { x:207, y: 28, w: 37, h: 64, label:'Axon Terminals',       desc:'Bulb-shaped endings that release neurotransmitters into the synaptic cleft' },
-                    { x:244, y: 30, w: 22, h: 60, label:'Synaptic Cleft',       desc:'~20 nm gap separating pre- and post-synaptic membranes where neurotransmitters diffuse' },
-                    { x:266, y:  0, w: 60, h:120, label:'Dendrites',            desc:'Dendritic spines face the cleft and carry receptor proteins that bind neurotransmitters' },
-                    { x:292, y: 38, w: 47, h: 44, label:'Cell Body (Soma)',     desc:'Sums received signals; fires a new action potential if the threshold is reached' },
-                    { x:348, y: 50, w:100, h: 20, label:'Axon & Myelin Sheath', desc:'Propagates the resulting action potential onward to the next neuron' },
-                    { x:449, y: 28, w: 38, h: 64, label:'Axon Terminals',       desc:'Pass the signal forward — the beginning of the next synapse in the chain' },
-                  ] as { x:number; y:number; w:number; h:number; label:string; desc:string }[]).map((hs, i) => (
-                    <rect key={`hs-${i}`} x={hs.x} y={hs.y} width={hs.w} height={hs.h}
-                      fill="transparent" style={{ cursor: 'default' }}
-                      onMouseEnter={() => setNeuronTip({ label: hs.label, desc: hs.desc })}
-                      onMouseLeave={() => setNeuronTip(null)}
-                    />
-                  ))}
                 </svg>
-
-                {/* Tooltip strip — shows on hover over any neuron part */}
-                <div style={{
-                  minHeight: 36, padding: '0 2px',
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  opacity: neuronTip ? 1 : 0,
-                  transform: neuronTip ? 'translateY(0)' : 'translateY(-4px)',
-                  transition: 'opacity 0.22s ease, transform 0.22s ease',
-                  pointerEvents: 'none',
-                }}>
-                  <div style={{
-                    width: 3, height: 28, borderRadius: 2, flexShrink: 0,
-                    background: 'linear-gradient(to bottom, rgba(99,102,241,0.9), rgba(52,211,153,0.6))',
-                  }}/>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <span style={{ fontSize: 10, fontWeight: 600, fontFamily: 'Inter',
-                      color: 'rgba(255,255,255,0.88)', letterSpacing: '0.03em' }}>
-                      {neuronTip?.label}
-                    </span>
-                    <span style={{ fontSize: 9.5, fontFamily: 'Inter', lineHeight: 1.35,
-                      color: 'rgba(255,255,255,0.48)' }}>
-                      {neuronTip?.desc}
-                    </span>
-                  </div>
-                </div>
 
                 {/* Stage progress dots — horizontal row */}
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: 4 }}>
