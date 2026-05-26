@@ -24,13 +24,13 @@ args = "synapse-viz-app"
 name = "synapse-viz-app"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd artifacts/synapse-viz-app && PORT=8081 pnpm dev"
-waitForPort = 8081
-
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=8081 BASE_PATH=/ pnpm --filter @workspace/synapse-viz-app run dev"
+waitForPort = 8081
 
 [agent]
 stack = "PNPM_WORKSPACE"
