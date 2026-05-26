@@ -1087,130 +1087,192 @@ export function SynapseViz() {
             const postStroke = s5 > 0.1 ? `rgba(244,114,182,${Math.min(s5,0.95)})` : 'rgba(52,211,153,0.34)';
 
             return (
-              <div style={{ display: 'flex', gap: 14, alignItems: 'center', marginBottom: 20,
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20,
                 background: 'rgba(4,8,20,0.5)', border: '1px solid rgba(99,102,241,0.13)',
                 borderRadius: 12, padding: '10px 12px' }}>
 
-                {/* Two-neuron SVG — proper neuron morphology */}
-                <svg viewBox="0 0 120 214" width={102} height={181} style={{ display: 'block', flexShrink: 0, overflow: 'visible' }}>
+                {/* Single detailed pre-synaptic neuron — full-width landscape, no labels */}
+                <svg viewBox="0 0 258 120" width="100%" height={96} style={{ display: 'block', overflow: 'visible' }}>
                   <defs>
                     <filter id="mgy" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                     <filter id="mgg" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                     <filter id="mgb" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                     <filter id="mgp" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                    <radialGradient id="mpre" cx="50%" cy="44%" r="60%">
-                      <stop offset="0%" stopColor="#1a2e5a"/><stop offset="100%" stopColor="#060e20"/>
+                    <radialGradient id="nSomaG" cx="38%" cy="32%" r="68%">
+                      <stop offset="0%"   stopColor="#4a8fd4"/>
+                      <stop offset="45%"  stopColor="#1b3d6e"/>
+                      <stop offset="100%" stopColor="#060e22"/>
                     </radialGradient>
-                    <radialGradient id="mpost" cx="50%" cy="40%" r="58%">
-                      <stop offset="0%" stopColor="#0d2a20"/><stop offset="100%" stopColor="#040e12"/>
+                    <radialGradient id="nNucG" cx="40%" cy="35%" r="65%">
+                      <stop offset="0%"   stopColor="#a0d4ff"/>
+                      <stop offset="100%" stopColor="#2878d0"/>
+                    </radialGradient>
+                    <radialGradient id="nTermG" cx="35%" cy="28%" r="72%">
+                      <stop offset="0%"   stopColor="#ff9060"/>
+                      <stop offset="100%" stopColor="#aa1800"/>
+                    </radialGradient>
+                    <radialGradient id="nDotG" cx="40%" cy="35%" r="65%">
+                      <stop offset="0%"   stopColor="#ffe08a"/>
+                      <stop offset="100%" stopColor="#c07820"/>
                     </radialGradient>
                   </defs>
 
-                  {/* ── PRE-SYNAPTIC NEURON ── */}
+                  {/* ══ DENDRITES — golden branching tree on the left ══ */}
+                  <g fill="none" strokeLinecap="round">
+                    {/* Upper main trunk */}
+                    <path d="M 59,46 C 47,37 33,26 19,16" stroke="rgba(200,140,40,0.65)" strokeWidth="2.8"/>
+                    <path d="M 19,16 C 11,10 4,4 0,1"     stroke="rgba(195,130,35,0.55)" strokeWidth="1.8"/>
+                    <path d="M 19,16 C 21,8 22,1 20,-3"   stroke="rgba(195,130,35,0.55)" strokeWidth="1.7"/>
+                    <path d="M 31,24 C 35,17 41,11 45,7"  stroke="rgba(188,124,33,0.45)" strokeWidth="1.4"/>
+                    <path d="M 45,7  C 48,2 51,-2 53,-4"  stroke="rgba(182,118,30,0.38)" strokeWidth="1.1"/>
+                    {/* Upper-mid trunk */}
+                    <path d="M 57,53 C 43,51 27,48 12,45" stroke="rgba(192,132,38,0.6)"  strokeWidth="2.2"/>
+                    <path d="M 12,45 C 5,43 -1,41 -5,38"  stroke="rgba(186,126,35,0.5)"  strokeWidth="1.6"/>
+                    <path d="M 12,45 C 13,37 16,29 19,25" stroke="rgba(186,126,35,0.5)"  strokeWidth="1.5"/>
+                    <path d="M 19,25 C 21,20 25,15 27,12" stroke="rgba(180,120,30,0.38)" strokeWidth="1.1"/>
+                    {/* Lower-mid trunk */}
+                    <path d="M 57,67 C 43,69 27,72 12,75" stroke="rgba(192,132,38,0.6)"  strokeWidth="2.2"/>
+                    <path d="M 12,75 C 5,77 -1,79 -5,82"  stroke="rgba(186,126,35,0.5)"  strokeWidth="1.6"/>
+                    <path d="M 12,75 C 13,83 16,91 19,95" stroke="rgba(186,126,35,0.5)"  strokeWidth="1.5"/>
+                    <path d="M 19,95 C 21,100 25,105 27,108" stroke="rgba(180,120,30,0.38)" strokeWidth="1.1"/>
+                    {/* Lower main trunk */}
+                    <path d="M 59,74 C 47,83 33,94 19,104" stroke="rgba(200,140,40,0.65)" strokeWidth="2.8"/>
+                    <path d="M 19,104 C 11,110 4,116 0,119" stroke="rgba(195,130,35,0.55)" strokeWidth="1.8"/>
+                    <path d="M 19,104 C 21,112 22,119 20,123" stroke="rgba(195,130,35,0.55)" strokeWidth="1.7"/>
+                    <path d="M 31,96  C 35,103 41,109 45,113" stroke="rgba(188,124,33,0.45)" strokeWidth="1.4"/>
+                    <path d="M 45,113 C 48,118 51,122 53,124" stroke="rgba(182,118,30,0.38)" strokeWidth="1.1"/>
+                  </g>
 
-                  {/* Dendrite glow (stage 2) */}
+                  {/* Stage-2 dendrite glow */}
                   {s2 > 0.2 && (
-                    <g stroke={`rgba(251,191,36,${s2*0.4})`} fill="none" strokeLinecap="round" filter="url(#mgy)">
-                      <path d="M 54,47 C 44,37 33,29 22,19" strokeWidth="2.5"/>
-                      <path d="M 60,44 C 58,33 55,21 50,11" strokeWidth="2.5"/>
-                      <path d="M 66,47 C 76,37 87,29 98,19" strokeWidth="2.5"/>
+                    <g stroke={`rgba(251,191,36,${s2*0.45})`} fill="none" strokeLinecap="round" filter="url(#mgy)">
+                      <path d="M 59,46 C 47,37 33,26 19,16" strokeWidth="2.6"/>
+                      <path d="M 57,53 C 43,51 27,48 12,45" strokeWidth="2.2"/>
+                      <path d="M 57,67 C 43,69 27,72 12,75" strokeWidth="2.2"/>
+                      <path d="M 59,74 C 47,83 33,94 19,104" strokeWidth="2.6"/>
                     </g>
                   )}
 
-                  {/* Pre-synaptic dendrites — 3 trunks each with 2 sub-branches */}
-                  <g stroke={preStroke} fill="none" strokeLinecap="round">
-                    <path d="M 54,47 C 44,37 33,29 22,19" strokeWidth="1.7"/>
-                    <path d="M 22,19 C 15,12 10,7 5,3"    strokeWidth="1.1"/>
-                    <path d="M 22,19 C 20,11 24,5 19,1"   strokeWidth="1.1"/>
-                    <path d="M 60,44 C 58,33 55,21 50,11" strokeWidth="1.7"/>
-                    <path d="M 50,11 C 46,5 41,1 37,0"    strokeWidth="1.1"/>
-                    <path d="M 50,11 C 53,4 58,1 61,0"    strokeWidth="1.1"/>
-                    <path d="M 66,47 C 76,37 87,29 98,19" strokeWidth="1.7"/>
-                    <path d="M 98,19 C 105,12 111,7 116,3" strokeWidth="1.1"/>
-                    <path d="M 98,19 C 100,11 96,4 101,1" strokeWidth="1.1"/>
-                  </g>
+                  {/* Dendrite tip glow dots */}
+                  {([
+                    [0,1],[20,-3],[45,7],[53,-4],
+                    [-5,38],[19,25],[27,12],
+                    [-5,82],[19,95],[27,108],
+                    [0,119],[20,123],[45,113],[53,124],
+                  ] as [number,number][]).map(([dx,dy], i) => (
+                    <circle key={i} cx={dx} cy={dy} r={2.6}
+                      fill="url(#nDotG)" filter="url(#mgy)"
+                      opacity={0.78 + 0.22 * Math.abs(Math.sin(animTime / 420 + i * 0.71))}
+                    />
+                  ))}
 
-                  {/* Cell body glow */}
-                  {s2 > 0.12 && <ellipse cx={60} cy={58} rx={19} ry={15} fill={`rgba(251,191,36,${s2*0.15})`} filter="url(#mgy)"/>}
-                  {/* Cell body (soma) */}
-                  <ellipse cx={60} cy={58} rx={14} ry={12} fill="url(#mpre)"
-                    stroke={preStroke} strokeWidth={s2>0.1?1.3:0.85}
-                    filter={s2>0.3?'url(#mgy)':undefined}/>
+                  {/* ══ SOMA ══ */}
+                  {s2 > 0.12 && <ellipse cx={73} cy={60} rx={31} ry={28} fill={`rgba(251,191,36,${s2*0.16})`} filter="url(#mgy)"/>}
+                  <ellipse cx={73} cy={60} rx={23} ry={21}
+                    fill="url(#nSomaG)"
+                    stroke={s2 > 0.1 ? `rgba(251,191,36,${s2*0.65+0.15})` : 'rgba(100,162,230,0.32)'}
+                    strokeWidth={1.5}
+                    filter={s2>0.3 ? 'url(#mgy)' : undefined}
+                  />
+                  {/* Inner cytoplasm ring */}
+                  <ellipse cx={71} cy={58} rx={17} ry={15} fill="none" stroke="rgba(80,142,212,0.11)" strokeWidth="2"/>
                   {/* Nucleus */}
-                  <ellipse cx={60} cy={58} rx={5} ry={4} fill="rgba(99,102,241,0.2)" stroke="rgba(165,180,252,0.24)" strokeWidth="0.6"/>
+                  <ellipse cx={75} cy={58} rx={10} ry={9}
+                    fill="url(#nNucG)" stroke="rgba(140,205,255,0.5)" strokeWidth="0.9"/>
+                  {/* Nucleolus */}
+                  <circle cx={76} cy={57} r={3.2} fill="rgba(225,242,255,0.82)"/>
+                  <circle cx={73} cy={61} r={1.6} fill="rgba(200,228,255,0.45)"/>
 
-                  {/* Axon hillock + axon */}
-                  <path d="M 57,70 C 57,86 58,103 59,119 L 60,133"
-                    fill="none" stroke={preStroke} strokeWidth="2.8" strokeLinecap="round"
-                    filter={s2>0.3?'url(#mgy)':undefined}/>
+                  {/* ══ AXON HILLOCK ══ */}
+                  <path d="M 93,56 C 97,58 101,59 106,60 C 101,61 97,62 93,64 Z"
+                    fill={`rgba(66,153,225,${0.48 + s2*0.32})`}/>
 
-                  {/* AP wave particles down axon */}
-                  {apPts.map(pp => <circle key={pp.id} cx={59} cy={pp.y} r={3} fill="#fbbf24" opacity={pp.op} filter="url(#mgy)"/>)}
+                  {/* ══ AXON — core tube ══ */}
+                  <line x1={106} y1={60} x2={207} y2={60}
+                    stroke={`rgba(66,153,225,${0.42 + s2*0.38})`}
+                    strokeWidth={4.2} strokeLinecap="round"
+                    filter={s2>0.3 ? 'url(#mgy)' : undefined}
+                  />
 
-                  {/* Axon terminal / bouton */}
-                  {s3 > 0.12 && <ellipse cx={60} cy={141} rx={16} ry={11} fill={`rgba(52,211,153,${s3*0.18})`} filter="url(#mgg)"/>}
-                  <ellipse cx={60} cy={141} rx={12} ry={9} fill="url(#mpre)"
-                    stroke={bouStroke} strokeWidth={s3>0.1?1.3:0.85}
-                    filter={s3>0.3?'url(#mgg)':undefined}/>
-                  {[53,60,67].map(cx => <circle key={cx} cx={cx} cy={141} r={1.9} fill="rgba(165,180,252,0.3)"/>)}
+                  {/* Myelin sheaths — 6 capsule segments (Nodes of Ranvier between them) */}
+                  {([109,122,135,148,161,174] as number[]).map((x, i) => (
+                    <rect key={i} x={x} y={56.5} width={11} height={7} rx={3.5}
+                      fill="rgba(168,222,252,0.18)"
+                      stroke={`rgba(148,212,246,${0.42 + s2*0.32})`}
+                      strokeWidth="0.85"
+                    />
+                  ))}
 
-                  {/* ── SYNAPSE CLEFT ── */}
-                  <line x1={46} y1={152} x2={74} y2={152}
-                    stroke={clfStroke} strokeWidth={s4>0.1?1.4:0.8}
-                    filter={s4>0.3?'url(#mgb)':undefined}/>
-                  <line x1={46} y1={161} x2={74} y2={161}
-                    stroke={s4>0.1?`rgba(96,165,250,${Math.min(s4*0.75,0.75)})`:'rgba(99,102,241,0.18)'}
-                    strokeWidth={s4>0.1?1.1:0.7}
-                    filter={s4>0.3?'url(#mgb)':undefined}/>
-                  {ntDts.map(d => <circle key={d.id} cx={d.cx} cy={d.cy} r={1.7} fill="rgba(147,197,253,0.9)" opacity={d.op} filter="url(#mgb)"/>)}
+                  {/* AP particles traveling along axon (Stage 2) */}
+                  {stageNum === 2 && apPts.map(pp => {
+                    const ax = lerp(106, 204, (pp.y - 72) / 61);
+                    return <circle key={pp.id} cx={ax} cy={60} r={3.6} fill="#fbbf24" opacity={pp.op} filter="url(#mgy)"/>;
+                  })}
 
-                  {/* ── POST-SYNAPTIC NEURON ── */}
-
-                  {/* Dendritic spines pointing upward (receiving end) */}
-                  <g stroke={postStroke} fill="none" strokeLinecap="round">
-                    <path d="M 50,163 L 48,167" strokeWidth="1.8"/>
-                    <path d="M 60,162 L 60,167" strokeWidth="1.8"/>
-                    <path d="M 70,163 L 72,167" strokeWidth="1.8"/>
+                  {/* ══ TERMINAL BRANCHES ══ */}
+                  <g fill="none" strokeLinecap="round">
+                    <path d="M 207,60 C 215,51 223,42 231,36" stroke={bouStroke} strokeWidth="2.2"/>
+                    <path d="M 207,60 C 215,57 221,55 229,53" stroke={bouStroke} strokeWidth="2.0"/>
+                    <path d="M 207,60 C 215,63 221,65 229,67" stroke={bouStroke} strokeWidth="2.0"/>
+                    <path d="M 207,60 C 215,69 223,78 231,84" stroke={bouStroke} strokeWidth="2.2"/>
                   </g>
 
-                  {/* Post cell body glow */}
-                  {s5 > 0.12 && <ellipse cx={60} cy={184} rx={23} ry={17} fill={`rgba(244,114,182,${s5*0.15})`} filter="url(#mgp)"/>}
-                  {/* Post cell body (soma) */}
-                  <ellipse cx={60} cy={184} rx={18} ry={12} fill="url(#mpost)"
-                    stroke={postStroke} strokeWidth={s5>0.1?1.3:0.85}
-                    filter={s5>0.3?'url(#mgp)':undefined}/>
-                  {/* Post nucleus */}
-                  <ellipse cx={60} cy={184} rx={6.5} ry={4.5} fill="rgba(5,150,105,0.16)" stroke="rgba(52,211,153,0.22)" strokeWidth="0.6"/>
-
-                  {/* Post-synaptic dendrites — branching downward / outward */}
-                  <g stroke={postStroke} fill="none" strokeLinecap="round">
-                    <path d="M 46,193 C 36,198 26,202 16,206" strokeWidth="1.7"/>
-                    <path d="M 16,206 C 10,209 5,211 1,213"   strokeWidth="1.1"/>
-                    <path d="M 60,196 C 57,202 55,208 53,213" strokeWidth="1.5"/>
-                    <path d="M 74,193 C 84,198 94,202 104,206" strokeWidth="1.7"/>
-                    <path d="M 104,206 C 110,209 115,211 119,213" strokeWidth="1.1"/>
-                  </g>
-
-                  {/* Post AP pulse particles */}
-                  {poPts.map(pp => <circle key={pp.id} cx={60} cy={pp.y} r={3} fill="#f472b6" opacity={pp.op} filter="url(#mgp)"/>)}
+                  {/* Synaptic knobs (terminal bulbs) */}
+                  {([
+                    [231,36],[229,53],[229,67],[231,84],
+                  ] as [number,number][]).map(([bx,by], i) => {
+                    const active = s3 > 0.12 || s4 > 0.12;
+                    const bulbFill = s3 > 0.12
+                      ? `rgba(52,211,153,${0.5 + s3*0.42})`
+                      : s4 > 0.12
+                      ? `rgba(96,165,250,${0.5 + s4*0.42})`
+                      : 'url(#nTermG)';
+                    return (
+                      <g key={i}>
+                        {active && (
+                          <circle cx={bx} cy={by} r={10}
+                            fill={`rgba(52,211,153,${Math.max(s3,s4)*0.2})`} filter="url(#mgg)"/>
+                        )}
+                        <circle cx={bx} cy={by} r={5.8}
+                          fill={bulbFill}
+                          stroke={bouStroke} strokeWidth="0.8"
+                          filter={active ? 'url(#mgg)' : undefined}
+                        />
+                        {/* NT release dots (stages 4-5) */}
+                        {stageNum >= 4 && (
+                          <circle
+                            cx={bx + 7}
+                            cy={by + Math.sin(animTime / 430 + i * 1.3) * 5}
+                            r={2.1} fill="rgba(147,197,253,0.9)"
+                            opacity={clamp01(ep * 4) * 0.88} filter="url(#mgb)"
+                          />
+                        )}
+                        {/* Stage 5 receptor-binding glow */}
+                        {s5 > 0.1 && (
+                          <circle cx={bx + 10} cy={by} r={7}
+                            fill={`rgba(244,114,182,${s5*0.42})`} filter="url(#mgp)"/>
+                        )}
+                      </g>
+                    );
+                  })}
                 </svg>
 
-                {/* Stage progress dots */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {/* Stage progress dots — horizontal row */}
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: 4 }}>
                   {STAGES.map((s, i) => {
                     const isActive = si === i;
                     const isDone   = si > i;
                     return (
-                      <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div key={s.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1 }}>
                         <div style={{
-                          width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
+                          width: 8, height: 8, borderRadius: '50%',
                           background: isActive ? s.color : isDone ? `${s.color}55` : 'rgba(255,255,255,0.1)',
-                          boxShadow: isActive ? `0 0 7px ${s.color}cc` : 'none',
+                          boxShadow: isActive ? `0 0 8px ${s.color}cc` : 'none',
                           transition: 'background 0.4s, box-shadow 0.4s',
                         }}/>
                         <span style={{
-                          fontSize: 10.5, fontFamily: 'Inter', lineHeight: 1.25,
-                          color: isActive ? 'rgba(255,255,255,0.88)' : isDone ? 'rgba(255,255,255,0.36)' : 'rgba(255,255,255,0.2)',
+                          fontSize: 8, fontFamily: 'Inter', lineHeight: 1.2, textAlign: 'center',
+                          color: isActive ? s.color : isDone ? 'rgba(255,255,255,0.32)' : 'rgba(255,255,255,0.18)',
                           transition: 'color 0.4s',
                         }}>{s.name}</span>
                       </div>
