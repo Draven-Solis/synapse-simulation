@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Synapse Visualizer"
+version = "1.0.0"
+id = "artifacts/synapse-viz-app"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19295
+
+[services.development]
+run = "pnpm --filter @workspace/synapse-viz-app run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/synapse-viz-app", "run", "build" ]
+publicDir = "artifacts/synapse-viz-app/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19295"
+BASE_PATH = "/"
