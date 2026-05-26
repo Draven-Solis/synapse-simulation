@@ -195,6 +195,7 @@ export function SynapseViz() {
   const speedRef = useRef(1);
   speedRef.current = speed;
   const [prog, setProg] = useState(0);       // 0-1 within stage
+  const [neuronTip, setNeuronTip] = useState<{ label: string; desc: string } | null>(null);
   const rafRef = useRef<number>(0);
   const lastRef = useRef<number>(0);
   const siRef  = useRef(si);
@@ -1390,7 +1391,51 @@ export function SynapseViz() {
                       />
                     </g>
                   ))}
+
+                  {/* ══ Transparent hover hotspots (on top, for tooltip detection) ══ */}
+                  {([
+                    { x:  0, y:  0, w: 62, h:120, label:'Dendrites',           desc:'Branch-like extensions that receive incoming signals from other neurons' },
+                    { x: 52, y: 38, w: 44, h: 44, label:'Cell Body (Soma)',     desc:'Integrates all incoming signals and contains the nucleus' },
+                    { x: 96, y: 50, w:111, h: 20, label:'Axon & Myelin Sheath', desc:'Long fiber conducting impulses; white segments (myelin) speed transmission via saltatory conduction' },
+                    { x:207, y: 28, w: 37, h: 64, label:'Axon Terminals',       desc:'Bulb-shaped endings that release neurotransmitters into the synaptic cleft' },
+                    { x:244, y: 30, w: 22, h: 60, label:'Synaptic Cleft',       desc:'~20 nm gap separating pre- and post-synaptic membranes where neurotransmitters diffuse' },
+                    { x:266, y:  0, w: 60, h:120, label:'Dendrites',            desc:'Dendritic spines face the cleft and carry receptor proteins that bind neurotransmitters' },
+                    { x:292, y: 38, w: 47, h: 44, label:'Cell Body (Soma)',     desc:'Sums received signals; fires a new action potential if the threshold is reached' },
+                    { x:348, y: 50, w:100, h: 20, label:'Axon & Myelin Sheath', desc:'Propagates the resulting action potential onward to the next neuron' },
+                    { x:449, y: 28, w: 38, h: 64, label:'Axon Terminals',       desc:'Pass the signal forward — the beginning of the next synapse in the chain' },
+                  ] as { x:number; y:number; w:number; h:number; label:string; desc:string }[]).map((hs, i) => (
+                    <rect key={`hs-${i}`} x={hs.x} y={hs.y} width={hs.w} height={hs.h}
+                      fill="transparent" style={{ cursor: 'default' }}
+                      onMouseEnter={() => setNeuronTip({ label: hs.label, desc: hs.desc })}
+                      onMouseLeave={() => setNeuronTip(null)}
+                    />
+                  ))}
                 </svg>
+
+                {/* Tooltip strip — shows on hover over any neuron part */}
+                <div style={{
+                  minHeight: 36, padding: '0 2px',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  opacity: neuronTip ? 1 : 0,
+                  transform: neuronTip ? 'translateY(0)' : 'translateY(-4px)',
+                  transition: 'opacity 0.22s ease, transform 0.22s ease',
+                  pointerEvents: 'none',
+                }}>
+                  <div style={{
+                    width: 3, height: 28, borderRadius: 2, flexShrink: 0,
+                    background: 'linear-gradient(to bottom, rgba(99,102,241,0.9), rgba(52,211,153,0.6))',
+                  }}/>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <span style={{ fontSize: 10, fontWeight: 600, fontFamily: 'Inter',
+                      color: 'rgba(255,255,255,0.88)', letterSpacing: '0.03em' }}>
+                      {neuronTip?.label}
+                    </span>
+                    <span style={{ fontSize: 9.5, fontFamily: 'Inter', lineHeight: 1.35,
+                      color: 'rgba(255,255,255,0.48)' }}>
+                      {neuronTip?.desc}
+                    </span>
+                  </div>
+                </div>
 
                 {/* Stage progress dots — horizontal row */}
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: 4 }}>
