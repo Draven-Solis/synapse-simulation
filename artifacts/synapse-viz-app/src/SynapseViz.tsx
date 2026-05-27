@@ -471,86 +471,125 @@ export function SynapseViz() {
             strokeWidth="1"
           />
 
-          {/* ── Mitochondrion — anatomically accurate, right-drifted inside bouton ── */}
+          {/* ── Mitochondria — main (right-drifted) + ghost (left), finger cristae ── */}
           {(() => {
-            const MCX = 300, MCY = 158;
             const mitoGlow = stageNum >= 3 ? clamp01(caOpen * 1.6) : 0;
-            const strokeColor = mitoGlow > 0.1
+
+            // ── shared helper: bean-shaped outer path ──────────────────────────
+            const beanOuter = (cx: number, cy: number, rx: number, ry: number) => [
+              `M ${cx-rx},${cy}`,
+              `C ${cx-rx},${cy-ry} ${cx-Math.round(rx*0.23)},${cy-ry} ${cx+Math.round(rx*0.32)},${cy-ry}`,
+              `C ${cx+Math.round(rx*0.91)},${cy-Math.round(ry*0.91)} ${cx+rx},${cy-Math.round(ry*0.36)} ${cx+rx},${cy}`,
+              `C ${cx+rx},${cy+Math.round(ry*0.36)} ${cx+Math.round(rx*0.91)},${cy+Math.round(ry*0.91)} ${cx+Math.round(rx*0.32)},${cy+ry}`,
+              `C ${cx-Math.round(rx*0.23)},${cy+ry} ${cx-rx},${cy+ry} ${cx-rx},${cy}`,
+              'Z',
+            ].join(' ');
+
+            const beanInner = (cx: number, cy: number, rx: number, ry: number) => [
+              `M ${cx-rx},${cy}`,
+              `C ${cx-rx},${cy-ry} ${cx-Math.round(rx*0.2)},${cy-ry} ${cx+Math.round(rx*0.3)},${cy-Math.round(ry*0.88)}`,
+              `C ${cx+Math.round(rx*0.94)},${cy-Math.round(ry*0.75)} ${cx+rx},${cy-Math.round(ry*0.3)} ${cx+rx},${cy}`,
+              `C ${cx+rx},${cy+Math.round(ry*0.3)} ${cx+Math.round(rx*0.94)},${cy+Math.round(ry*0.75)} ${cx+Math.round(rx*0.3)},${cy+Math.round(ry*0.88)}`,
+              `C ${cx-Math.round(rx*0.2)},${cy+ry} ${cx-rx},${cy+ry} ${cx-rx},${cy}`,
+              'Z',
+            ].join(' ');
+
+            // ── finger-crista renderer ─────────────────────────────────────────
+            // Each finger is a short inward projection from the inner membrane.
+            // Top fingers project downward; bottom fingers project upward.
+            const renderFingers = (
+              cx: number, cy: number,
+              irx: number, iry: number,
+              sw: number,
+            ) => {
+              const TOP = [
+                { ox: -Math.round(irx*0.56), len: iry*0.70 },
+                { ox: -Math.round(irx*0.13), len: iry*0.78 },
+                { ox:  Math.round(irx*0.44), len: iry*0.70 },
+                { ox:  Math.round(irx*0.81), len: iry*0.52 },
+              ];
+              const BOT = [
+                { ox: -Math.round(irx*0.63), len: iry*0.64 },
+                { ox: -Math.round(irx*0.19), len: iry*0.75 },
+                { ox:  Math.round(irx*0.31), len: iry*0.72 },
+                { ox:  Math.round(irx*0.75), len: iry*0.56 },
+              ];
+              const paths: React.ReactNode[] = [];
+              TOP.forEach((f, i) => {
+                const h = iry * Math.sqrt(Math.max(0, 1 - (f.ox / irx) ** 2));
+                const sy = cy - h, ey = sy + f.len, my = (sy + ey) / 2;
+                paths.push(
+                  <path key={`tf-${i}`}
+                    d={`M ${cx+f.ox},${sy} Q ${cx+f.ox+2},${my} ${cx+f.ox},${ey}`}
+                    stroke="rgba(251,191,36,0.52)" strokeWidth={sw}
+                    fill="none" strokeLinecap="round"/>
+                );
+              });
+              BOT.forEach((f, i) => {
+                const h = iry * Math.sqrt(Math.max(0, 1 - (f.ox / irx) ** 2));
+                const sy = cy + h, ey = sy - f.len, my = (sy + ey) / 2;
+                paths.push(
+                  <path key={`bf-${i}`}
+                    d={`M ${cx+f.ox},${sy} Q ${cx+f.ox-2},${my} ${cx+f.ox},${ey}`}
+                    stroke="rgba(251,191,36,0.44)" strokeWidth={sw}
+                    fill="none" strokeLinecap="round"/>
+                );
+              });
+              return paths;
+            };
+
+            // ── MAIN mitochondrion (right-drifted) ────────────────────────────
+            const MCX = 300, MCY = 158;
+            const oD  = beanOuter(MCX, MCY, 22, 11);
+            const iD  = beanInner(MCX, MCY, 16,  8);
+            const strokeMain = mitoGlow > 0.1
               ? `rgba(245,158,11,${0.55 + mitoGlow * 0.32})`
               : 'rgba(245,158,11,0.55)';
 
-            // Outer membrane — bean-like path, ~18% smaller than before
-            const outerD = [
-              `M ${MCX-22},${MCY}`,
-              `C ${MCX-22},${MCY-11} ${MCX-5},${MCY-11} ${MCX+7},${MCY-11}`,
-              `C ${MCX+20},${MCY-10} ${MCX+22},${MCY-4} ${MCX+22},${MCY}`,
-              `C ${MCX+22},${MCY+4}  ${MCX+20},${MCY+10} ${MCX+7},${MCY+11}`,
-              `C ${MCX-5},${MCY+11}  ${MCX-22},${MCY+11} ${MCX-22},${MCY}`,
-              'Z',
-            ].join(' ');
-
-            // Inner membrane — inset bean, scaled to match
-            const innerD = [
-              `M ${MCX-16},${MCY}`,
-              `C ${MCX-16},${MCY-7}  ${MCX-3},${MCY-8}  ${MCX+5},${MCY-7}`,
-              `C ${MCX+15},${MCY-6}  ${MCX+16},${MCY-3} ${MCX+16},${MCY}`,
-              `C ${MCX+16},${MCY+3}  ${MCX+15},${MCY+6}  ${MCX+5},${MCY+7}`,
-              `C ${MCX-3},${MCY+8}   ${MCX-16},${MCY+7}  ${MCX-16},${MCY}`,
-              'Z',
-            ].join(' ');
-
-            // Cristae offsets & heights scaled proportionally
-            const CRISTAE = [
-              { ox: -9, h: 6.5 },
-              { ox: -3, h: 8.0 },
-              { ox:  3, h: 8.0 },
-              { ox:  9, h: 6.5 },
-            ];
+            // ── GHOST mitochondrion (left side, dimmer, smaller) ──────────────
+            const GCX = 192, GCY = 163;
+            const gOD = beanOuter(GCX, GCY, 14, 7);
+            const gID = beanInner(GCX, GCY, 10, 5);
 
             return (
-              <g opacity={0.86}>
-                {/* Energy glow halo during Stage 3 */}
-                {mitoGlow > 0.05 && (
-                  <ellipse cx={MCX} cy={MCY} rx={29} ry={16}
-                    fill={`rgba(245,158,11,${mitoGlow * 0.15})`}
-                    filter="url(#glow-y)"/>
-                )}
+              <>
+                {/* ─── Ghost mito (left) ─── */}
+                <g opacity={0.40}>
+                  <path d={gOD}
+                    fill="rgba(245,158,11,0.07)"
+                    stroke="rgba(245,158,11,0.38)" strokeWidth="1.0"/>
+                  <path d={gOD} fill="rgba(245,158,11,0.04)" stroke="none"/>
+                  <path d={gID} fill="rgba(10,6,2,0.65)"/>
+                  <path d={gID} fill="none"
+                    stroke="rgba(251,191,36,0.30)" strokeWidth="0.7"/>
+                  {renderFingers(GCX, GCY, 10, 5, 0.65)}
+                </g>
 
-                {/* Outer membrane — smooth bean-shaped envelope */}
-                <path d={outerD}
-                  fill="rgba(245,158,11,0.09)"
-                  stroke={strokeColor} strokeWidth="1.4"
-                  filter={mitoGlow > 0.45 ? 'url(#glow-y)' : undefined}/>
-
-                {/* Intermembrane space — visible amber fill between outer and inner */}
-                <path d={outerD}
-                  fill="rgba(245,158,11,0.06)" stroke="none"/>
-
-                {/* Matrix — deep dark fill inside inner membrane */}
-                <path d={innerD} fill="rgba(10,6,2,0.72)"/>
-
-                {/* Inner membrane boundary */}
-                <path d={innerD}
-                  fill="none"
-                  stroke="rgba(251,191,36,0.38)" strokeWidth="0.9"/>
-
-                {/* Cristae — full-height sigmoid arcs across the matrix */}
-                {CRISTAE.map((c, i) => (
-                  <path key={i}
-                    d={`M ${MCX+c.ox},${MCY-c.h} C ${MCX+c.ox+3},${MCY-c.h/2} ${MCX+c.ox-3},${MCY+c.h/2} ${MCX+c.ox},${MCY+c.h}`}
-                    stroke={`rgba(251,191,36,${i % 2 === 0 ? 0.50 : 0.42})`}
-                    strokeWidth="0.9" fill="none" strokeLinecap="round"/>
-                ))}
-
-                {/* Label */}
-                <text x={MCX} y={MCY + 19} textAnchor="middle"
-                  fontSize="5.5" fontFamily="Inter"
-                  fill={mitoGlow > 0.1
-                    ? `rgba(251,191,36,${0.36 + mitoGlow * 0.42})`
-                    : 'rgba(251,191,36,0.30)'}>
-                  Mitochondrion
-                </text>
-              </g>
+                {/* ─── Main mito (right) ─── */}
+                <g opacity={0.87}>
+                  {mitoGlow > 0.05 && (
+                    <ellipse cx={MCX} cy={MCY} rx={29} ry={16}
+                      fill={`rgba(245,158,11,${mitoGlow * 0.15})`}
+                      filter="url(#glow-y)"/>
+                  )}
+                  <path d={oD}
+                    fill="rgba(245,158,11,0.09)"
+                    stroke={strokeMain} strokeWidth="1.4"
+                    filter={mitoGlow > 0.45 ? 'url(#glow-y)' : undefined}/>
+                  <path d={oD} fill="rgba(245,158,11,0.06)" stroke="none"/>
+                  <path d={iD} fill="rgba(10,6,2,0.72)"/>
+                  <path d={iD} fill="none"
+                    stroke="rgba(251,191,36,0.38)" strokeWidth="0.9"/>
+                  {renderFingers(MCX, MCY, 16, 8, 0.9)}
+                  <text x={MCX} y={MCY + 19} textAnchor="middle"
+                    fontSize="5.5" fontFamily="Inter"
+                    fill={mitoGlow > 0.1
+                      ? `rgba(251,191,36,${0.36 + mitoGlow * 0.42})`
+                      : 'rgba(251,191,36,0.30)'}>
+                    Mitochondrion
+                  </text>
+                </g>
+              </>
             );
           })()}
 
