@@ -1198,6 +1198,18 @@ export function SynapseViz() {
             d="M 108,453 Q 240,438 372,453 C 388,508 385,592 360,630 Q 240,650 120,630 C 95,592 92,508 108,453 Z"
             fill="url(#postGrad)"
           />
+          {/* Subtle arch outline — mirrors axon terminal outline style */}
+          <path
+            d="M 108,453 Q 240,438 372,453 C 388,508 385,592 360,630 Q 240,650 120,630 C 95,592 92,508 108,453"
+            fill="none"
+            stroke={
+              stageNum === 5
+                ? `rgba(244,114,182,${lerp(0.14, 0.36, recBound)})`
+                : 'rgba(52,211,153,0.16)'
+            }
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
           <text x={CX} y="520" textAnchor="middle" fontSize="8.5"
             fill="rgba(110,231,183,0.3)" fontFamily="Inter">Post-synaptic Dendrite</text>
 
