@@ -473,46 +473,45 @@ export function SynapseViz() {
 
           {/* ── Mitochondrion — anatomically accurate, right-drifted inside bouton ── */}
           {(() => {
-            const MCX = 285, MCY = 158;
+            const MCX = 300, MCY = 158;
             const mitoGlow = stageNum >= 3 ? clamp01(caOpen * 1.6) : 0;
             const strokeColor = mitoGlow > 0.1
               ? `rgba(245,158,11,${0.55 + mitoGlow * 0.32})`
               : 'rgba(245,158,11,0.55)';
 
-            // Outer membrane — bean-like closed path (slightly asymmetric oval)
+            // Outer membrane — bean-like path, ~18% smaller than before
             const outerD = [
-              `M ${MCX-27},${MCY}`,
-              `C ${MCX-27},${MCY-13} ${MCX-6},${MCY-14} ${MCX+8},${MCY-13}`,
-              `C ${MCX+24},${MCY-12} ${MCX+27},${MCY-5} ${MCX+27},${MCY}`,
-              `C ${MCX+27},${MCY+5}  ${MCX+24},${MCY+12} ${MCX+8},${MCY+13}`,
-              `C ${MCX-6},${MCY+14}  ${MCX-27},${MCY+13} ${MCX-27},${MCY}`,
+              `M ${MCX-22},${MCY}`,
+              `C ${MCX-22},${MCY-11} ${MCX-5},${MCY-11} ${MCX+7},${MCY-11}`,
+              `C ${MCX+20},${MCY-10} ${MCX+22},${MCY-4} ${MCX+22},${MCY}`,
+              `C ${MCX+22},${MCY+4}  ${MCX+20},${MCY+10} ${MCX+7},${MCY+11}`,
+              `C ${MCX-5},${MCY+11}  ${MCX-22},${MCY+11} ${MCX-22},${MCY}`,
               'Z',
             ].join(' ');
 
-            // Inner membrane — inset bean matching outer shape, matrix will fill it
+            // Inner membrane — inset bean, scaled to match
             const innerD = [
-              `M ${MCX-20},${MCY}`,
-              `C ${MCX-20},${MCY-9}  ${MCX-4},${MCY-10} ${MCX+6},${MCY-9}`,
-              `C ${MCX+18},${MCY-8}  ${MCX+20},${MCY-4} ${MCX+20},${MCY}`,
-              `C ${MCX+20},${MCY+4}  ${MCX+18},${MCY+8}  ${MCX+6},${MCY+9}`,
-              `C ${MCX-4},${MCY+10}  ${MCX-20},${MCY+9}  ${MCX-20},${MCY}`,
+              `M ${MCX-16},${MCY}`,
+              `C ${MCX-16},${MCY-7}  ${MCX-3},${MCY-8}  ${MCX+5},${MCY-7}`,
+              `C ${MCX+15},${MCY-6}  ${MCX+16},${MCY-3} ${MCX+16},${MCY}`,
+              `C ${MCX+16},${MCY+3}  ${MCX+15},${MCY+6}  ${MCX+5},${MCY+7}`,
+              `C ${MCX-3},${MCY+8}   ${MCX-16},${MCY+7}  ${MCX-16},${MCY}`,
               'Z',
             ].join(' ');
 
-            // Cristae — sigmoid S-curves spanning full inner-membrane height at each x
-            // height at offset ox: h ≈ 10·√(1 − (ox/20)²)
+            // Cristae offsets & heights scaled proportionally
             const CRISTAE = [
-              { ox: -11, h: 8.0 },
-              { ox:  -4, h: 9.8 },
-              { ox:   4, h: 9.8 },
-              { ox:  11, h: 8.0 },
+              { ox: -9, h: 6.5 },
+              { ox: -3, h: 8.0 },
+              { ox:  3, h: 8.0 },
+              { ox:  9, h: 6.5 },
             ];
 
             return (
               <g opacity={0.86}>
                 {/* Energy glow halo during Stage 3 */}
                 {mitoGlow > 0.05 && (
-                  <ellipse cx={MCX} cy={MCY} rx={35} ry={20}
+                  <ellipse cx={MCX} cy={MCY} rx={29} ry={16}
                     fill={`rgba(245,158,11,${mitoGlow * 0.15})`}
                     filter="url(#glow-y)"/>
                 )}
@@ -520,31 +519,31 @@ export function SynapseViz() {
                 {/* Outer membrane — smooth bean-shaped envelope */}
                 <path d={outerD}
                   fill="rgba(245,158,11,0.09)"
-                  stroke={strokeColor} strokeWidth="1.5"
+                  stroke={strokeColor} strokeWidth="1.4"
                   filter={mitoGlow > 0.45 ? 'url(#glow-y)' : undefined}/>
 
-                {/* Intermembrane space — visible amber ring between outer and inner */}
+                {/* Intermembrane space — visible amber fill between outer and inner */}
                 <path d={outerD}
                   fill="rgba(245,158,11,0.06)" stroke="none"/>
 
-                {/* Matrix — fills inner membrane space with deep dark colour */}
+                {/* Matrix — deep dark fill inside inner membrane */}
                 <path d={innerD} fill="rgba(10,6,2,0.72)"/>
 
                 {/* Inner membrane boundary */}
                 <path d={innerD}
                   fill="none"
-                  stroke="rgba(251,191,36,0.38)" strokeWidth="1.0"/>
+                  stroke="rgba(251,191,36,0.38)" strokeWidth="0.9"/>
 
                 {/* Cristae — full-height sigmoid arcs across the matrix */}
                 {CRISTAE.map((c, i) => (
                   <path key={i}
-                    d={`M ${MCX+c.ox},${MCY-c.h} C ${MCX+c.ox+4},${MCY-c.h/2} ${MCX+c.ox-4},${MCY+c.h/2} ${MCX+c.ox},${MCY+c.h}`}
+                    d={`M ${MCX+c.ox},${MCY-c.h} C ${MCX+c.ox+3},${MCY-c.h/2} ${MCX+c.ox-3},${MCY+c.h/2} ${MCX+c.ox},${MCY+c.h}`}
                     stroke={`rgba(251,191,36,${i % 2 === 0 ? 0.50 : 0.42})`}
-                    strokeWidth="1.0" fill="none" strokeLinecap="round"/>
+                    strokeWidth="0.9" fill="none" strokeLinecap="round"/>
                 ))}
 
                 {/* Label */}
-                <text x={MCX} y={MCY + 23} textAnchor="middle"
+                <text x={MCX} y={MCY + 19} textAnchor="middle"
                   fontSize="5.5" fontFamily="Inter"
                   fill={mitoGlow > 0.1
                     ? `rgba(251,191,36,${0.36 + mitoGlow * 0.42})`
@@ -718,7 +717,7 @@ export function SynapseViz() {
           {/* Mitochondria callout — stage 3, leader from centred mito right edge */}
           {stageNum === 3 && caOpen > 0.25 && (
             <g opacity={clamp01((caOpen - 0.25) * 3.5)}>
-              <line x1="312" y1="153" x2="360" y2="136"
+              <line x1="322" y1="153" x2="360" y2="136"
                 stroke="rgba(245,158,11,0.38)" strokeWidth="0.9" strokeDasharray="3 2"/>
               <text x="362" y="132" textAnchor="start" fontSize="7.5"
                 fill="rgba(245,158,11,0.78)" fontFamily="Inter" fontWeight="600">Mitochondrion</text>
@@ -731,7 +730,7 @@ export function SynapseViz() {
 
           {/* ── Stage 3: ATP molecules travelling from mito to vesicle pools ── */}
           {stageNum === 3 && prog > 0.04 && (() => {
-            const MCX = 285, MCY = 158;
+            const MCX = 300, MCY = 158;
             // Two targets — left & right reserve-vesicle clusters
             const streams: { ctrlX: number; ctrlY: number; endX: number; endY: number; phase: number }[] = [
               { ctrlX: 185, ctrlY: 215, endX: 188, endY: 294, phase: 0      },
