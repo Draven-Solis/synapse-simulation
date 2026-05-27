@@ -1210,6 +1210,47 @@ export function SynapseViz() {
             strokeWidth="1.8"
             strokeLinecap="round"
           />
+
+          {/* ── Dendritic spine protrusions — one mushroom-shaped bump per receptor site ──
+              Arch formula (quadratic bezier M 108,453 Q 240,438 372,453):
+                t = (cx−108)/264 → y = 453 − 30t + 30t²
+              Each spine: narrow neck rising from the arch, rounded dome head at the top. */}
+          {RECEPTORS.map((rec, ri) => {
+            const t   = (rec.cx - 108) / 264;
+            const ay  = 453 - 30 * t + 30 * t * t;    // arch surface y at this cx
+            const bound = stageNum === 5 && recBound > ri * 0.14;
+            const bindT = bound ? clamp01((recBound - ri * 0.14) / 0.55) : 0;
+            const spFill   = bound
+              ? `rgba(244,114,182,${0.09 + bindT * 0.13})`
+              : 'rgba(52,211,153,0.06)';
+            const spStroke = bound
+              ? `rgba(244,114,182,${0.30 + bindT * 0.32})`
+              : 'rgba(52,211,153,0.22)';
+            return (
+              <g key={`sp-${ri}`}>
+                {/* Neck — narrow stalk from dendrite shaft up to head */}
+                <line
+                  x1={rec.cx} y1={ay + 8} x2={rec.cx} y2={ay + 1}
+                  stroke={spStroke} strokeWidth="3.5"
+                  strokeLinecap="round" opacity={0.55}/>
+                {/* Head — smooth dome arc sitting on the membrane surface */}
+                <path
+                  d={`M ${rec.cx - 9},${ay} Q ${rec.cx},${ay - 9} ${rec.cx + 9},${ay}`}
+                  fill={spFill} stroke={spStroke}
+                  strokeWidth="1.3" strokeLinecap="round"/>
+                {/* Subtle glow on spine head when receptor binds */}
+                {bound && bindT > 0.3 && (
+                  <path
+                    d={`M ${rec.cx - 9},${ay} Q ${rec.cx},${ay - 9} ${rec.cx + 9},${ay}`}
+                    fill="none"
+                    stroke={`rgba(244,114,182,${bindT * 0.4})`}
+                    strokeWidth="2.5" strokeLinecap="round"
+                    filter="url(#glow-p)"/>
+                )}
+              </g>
+            );
+          })}
+
           <text x={CX} y="520" textAnchor="middle" fontSize="8.5"
             fill="rgba(110,231,183,0.3)" fontFamily="Inter">Post-synaptic Dendrite</text>
 
