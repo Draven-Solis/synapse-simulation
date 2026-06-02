@@ -6,7 +6,7 @@ Visual exploration of how neurons communicate through animated synapses.
 
 ## ✨ Live Demo
 
-### [→ Open Visualizer](https://synaptic-mapper.netlify.app/)
+[→ Open Visualizer](https://synaptic-mapper.netlify.app/)
 
 ---
 
