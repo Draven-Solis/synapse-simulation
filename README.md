@@ -1,68 +1,70 @@
-# Synapse Simulation
+# 🧠 Synapse Simulation
 
-Interactive neurological visualization platform showcasing synaptic transmission and neural signal propagation.
+A visual tool that shows how nerves communicate with each other through animated synapses (connections between neurons).
 
-## Quick Start
+## What Does It Do?
+
+Watch neurons fire and signals travel across synapses in real-time. Perfect for learning how the brain works visually.
+
+## Getting Started (Super Easy)
 
 ```bash
-# Install
+# Install everything
 pnpm install
 
-# Setup environment
+# Set up your database connection
 DATABASE_URL=postgresql://user:pass@localhost/synapse_sim
 
-# Run
-pnpm --filter @workspace/synapse-viz-app run dev  # UI (port 8081)
-pnpm --filter @workspace/api-server run dev       # API (port 5000)
+# Start the visualizer (open in browser at localhost:8081)
+pnpm --filter @workspace/synapse-viz-app run dev
 
-# Type check & build
-pnpm run typecheck
-pnpm run build
+# Start the backend (runs at localhost:5000)
+pnpm --filter @workspace/api-server run dev
 ```
 
-## Tech Stack
+## What You'll See
 
-- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS
-- **Backend**: Express 5, Node.js 24, Pino logging
-- **Database**: PostgreSQL + Drizzle ORM
-- **Build**: pnpm workspaces, esbuild
+- 🎨 **Beautiful Animations** - Watch synapses light up with ion waves
+- ⚡ **Real-time Signals** - See neural signals propagate through networks
+- 🎮 **Interactive Controls** - Play, pause, and speed up animations
 
-## Project Structure
+## Built With
 
-```
-artifacts/        # Apps (api-server, synapse-viz-app)
-lib/             # Shared libraries (api-client, db, schemas)
-scripts/         # Utility scripts
-```
+| Part | Technology |
+|------|-----------|
+| **What You See** | React (JavaScript framework) |
+| **The Brains** | Express.js (backend server) |
+| **Data Storage** | PostgreSQL (database) |
+| **Code Language** | TypeScript (safer JavaScript) |
 
-## Key Commands
+## Main Commands
 
-| Command | Purpose |
-|---------|---------|
-| `pnpm run typecheck` | Full type check |
-| `pnpm run build` | Build all packages |
-| `pnpm --filter @workspace/api-spec run codegen` | Regenerate API types from OpenAPI |
-| `pnpm --filter @workspace/db run push` | Push database migrations |
-
-## Environment Variables
-
-```
-DATABASE_URL=postgresql://user:password@localhost:5432/synapse_sim
-NODE_ENV=development
+```bash
+pnpm run build          # Build everything
+pnpm run typecheck      # Check for code errors
 ```
 
-## Architecture
+## How It's Organized
 
-- **Monorepo**: pnpm workspaces for modular code organization
-- **Animation**: RequestAnimationFrame + custom wave particle system
-- **API**: Express + Zod validation + OpenAPI codegen
-- **State**: React Query for server state
+```
+📁 synapse-simulation
+  📂 artifacts/        ← The actual apps (UI & backend)
+  📂 lib/             ← Shared code libraries
+  📂 scripts/         ← Helper scripts
+```
 
-## Ports
+## Where to Access
 
-- API: 5000
-- Visualizer: 8081
+- **Visualizer** → http://localhost:8081
+- **API** → http://localhost:5000
+
+## Need Help?
+
+Make sure:
+- ✅ PostgreSQL is running
+- ✅ You set `DATABASE_URL` in your environment
+- ✅ You're using `pnpm` (not npm or yarn)
 
 ## License
 
-MIT
+MIT - Free to use!
