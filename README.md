@@ -10,6 +10,12 @@ Visual exploration of how neurons communicate through animated synapses.
 
 ---
 
+## 📸 Screenshots
+
+![Synapse Visualizer](assets/synapse-viz.png)
+
+---
+
 ## 🎯 What It Does
 
 - 🎨 Watch neurons fire in real-time
