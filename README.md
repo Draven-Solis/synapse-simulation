@@ -12,7 +12,11 @@ Visual exploration of how neurons communicate through animated synapses.
 
 ## 📸 Screenshots
 
-![Synapse Visualizer](assets/synapse-viz.png)
+![Synapse Visualizer](attached_assets/1778330142962_1779759792815.png)
+
+![Animation Demo](attached_assets/Skreenup_1780399865234.png)
+
+![Controls](attached_assets/Skreenup_1780400009180.png)
 
 ---
 
