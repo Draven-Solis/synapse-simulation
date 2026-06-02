@@ -6,7 +6,11 @@ A visual tool that shows how nerves communicate with each other through animated
 
 Watch neurons fire and signals travel across synapses in real-time. Perfect for learning how the brain works visually.
 
-## Getting Started (Super Easy)
+## Try It Online
+
+👉 **[Open Synapse Visualizer](https://synaptic-mapper.netlify.app/)**
+
+## Getting Started (For Developers)
 
 ```bash
 # Install everything
@@ -52,11 +56,6 @@ pnpm run typecheck      # Check for code errors
   📂 lib/             ← Shared code libraries
   📂 scripts/         ← Helper scripts
 ```
-
-## Where to Access
-
-- **Visualizer** → http://localhost:8081
-- **API** → http://localhost:5000
 
 ## Need Help?
 
